@@ -1,14 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-//using NetProject.Models;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using NetProject.Models;
+
 
 namespace NetProject.Data
 {
-    public class MyAppDbContext : DbContext
+    public class MyAppDbContext : IdentityDbContext<ApplicationUser>
     {
-        public MyAppDbContext(DbContextOptions<MyAppDbContext> options)
-            : base(options)
-        {
-        }
+        public MyAppDbContext(DbContextOptions<MyAppDbContext> options) : base(options) { }
+
 
         // DbSety: każda właściwość to tabelka w bazie
         //public DbSet<Product> Products { get; set; }
