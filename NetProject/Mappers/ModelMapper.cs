@@ -6,7 +6,7 @@ using Riok.Mapperly.Abstractions;
 namespace NetProject.Mappers
 {
     [Mapper]
-    public partial class ModelMapper
+    public static partial class ModelMapper
     {
         // Mapperly wygeneruje metody mapujące po dodaniu odpowiednich atrybutów.
         public static partial CustomerDTO ToCustomerDTO(Customer customer);

@@ -1,61 +1,78 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
 using NetProject.Models;
 using NetProject.Data;
-using NetProject.Mappers; // Dodanie przestrzeni nazw do mapowania
 using NetProject.DTOs;
-using Microsoft.Extensions.DependencyInjection;
+using NetProject.Mappers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Rejestracja DbContext
-var cs = builder.Configuration.GetConnectionString("DefaultConnection");
+// 1) DbContext
 builder.Services.AddDbContext<MyAppDbContext>(opt =>
-    opt.UseSqlServer(cs));
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Rejestracja Identity (tożsamości i ról)
+// 2) Identity
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<MyAppDbContext>()
     .AddDefaultTokenProviders();
 
-// Dodanie autoryzacji
+// 3) (opcjonalnie) jeśli chcesz seedować Mapperly przy użyciu DI — nie jest to konieczne, bo metody są statyczne
+// builder.Services.AddMapperly();  
+
+// 4) Authorization
 builder.Services.AddAuthorization();
+
+// 5) Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "NetProject API", Version = "v1" });
+});
 
 var app = builder.Build();
 
-// Inicjalizacja ról i admina, teraz po zarejestrowaniu usług Identity
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await DbInitializer.SeedRolesAndAdminAsync(services);
-    
-    var context = services.GetRequiredService<MyAppDbContext>();
-    await DbInitializer.SeedSampleDataAsync(context);
-}
+// 6) Seed ról, admina i przykładowych danych
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+await DbInitializer.SeedRolesAndAdminAsync(services);
+await DbInitializer.SeedSampleDataAsync(services.GetRequiredService<MyAppDbContext>());
 
-// TEST: Endpoint, który sprawdzi połączenie z DB
+// 7) Swagger middleware (przed auth i endpointami)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "NetProject API v1");
+
+    c.RoutePrefix = "swagger";
+});
+
+// 8) Auth
+app.UseAuthentication();
+app.UseAuthorization();
+
+// 9) Root endpoint z linkiem do Swagger UI
 app.MapGet("/", async (MyAppDbContext db) =>
 {
-    var canConnect = await db.Database.CanConnectAsync();
-    return canConnect ? "Połączono z bazą danych!" : "Brak połączenia!";
+    var status = await db.Database.CanConnectAsync()
+        ? "Połączono z bazą danych!"
+        : "Nie udało się połączyć z bazą!";
+    var html = $@"
+      <html><body style='font-family:sans-serif'>
+        <h1>{status}</h1>
+        <p><a href=""/swagger"">Przejdź do dokumentacji API (Swagger)</a></p>
+      </body></html>";
+    return Results.Content(html, "text/html; charset=utf-8");
 });
 
-// Endpoint, który zwróci klientów jako DTO
+// 10) Endpoint GET /api/customers z użyciem ModelMapper
 app.MapGet("/api/customers", async (MyAppDbContext db) =>
 {
-    // Pobieramy klientów z bazy
-    var customers = await db.Customers.ToListAsync();
-
-    // Mapujemy klientów na DTO za pomocą ModelMapper
-    var customerDTOs = customers.Select(c => ModelMapper.ToCustomerDTO(c)).ToList();
-
-    // Zwracamy mapowane dane
-    return Results.Ok(customerDTOs);
+    var customers = await db.Customers.Include(c => c.Vehicles).ToListAsync();
+    // statyczna metoda wygenerowana przez Mapperly
+    var dtos = customers.Select(ModelMapper.ToCustomerDTO);
+    return Results.Ok(dtos);
 });
 
-// Middleware do autoryzacji
-app.UseAuthentication();
-app.UseAuthorization(); // Użycie autoryzacji
-
-// Uruchomienie aplikacji
+// 11) Uruchomienie
 app.Run();
