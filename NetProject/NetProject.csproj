@@ -9,8 +9,6 @@
 
     <ItemGroup>
       <Folder Include="Controllers\" />
-      <Folder Include="DTOs\" />
-      <Folder Include="Mappers\" />
       <Folder Include="Services\" />
       <Folder Include="Views\" />
       <Folder Include="wwwroot\" />
@@ -24,6 +22,7 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>
+      <PackageReference Include="riok.Mapperly" Version="4.2.1" />
     </ItemGroup>
 
 </Project>
