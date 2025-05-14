@@ -1,0 +1,53 @@
+# Rider
+.idea/
+*.sln.iml
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+out/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Dotnet-specific
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+packages/
+*.psmdcp
+
+# Logs
+*.log
+
+# VS Code (jeśli ktoś użyje VS Code)
+.vscode/
+
+# Rider inspections / caches
+.idea/
+.idea_modules/
+.idea/*
+
+# ASP.NET
+wwwroot/lib/
+
+# EF Core Migrations Snapshots
+*Migrations/*Snapshot.cs
