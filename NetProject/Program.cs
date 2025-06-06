@@ -25,9 +25,15 @@ builder.Services.AddDbContext<MyAppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 3) Rejestracja Identity (użytkownicy + role)
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+        options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<MyAppDbContext>()
     .AddDefaultTokenProviders();
+
+
+
+// Dodaj Razor Pages (bo strony logowania/ rejestracji będą w formie Razor Pages):
+builder.Services.AddRazorPages();
 
 // 4) (opcjonalnie) Rejestracja Mapperly – metody są statyczne, więc nie trzeba
 // builder.Services.AddMapperly();
@@ -96,6 +102,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // ────────────────────────────────────────────────────────────────────────────────
+
+app.MapRazorPages();
+
 // 11) GET /api/customers  – lista klientów (CustomerDTO)
 app.MapGet("/api/customers", async (MyAppDbContext db, ILogger<Program> logger) =>
 {
