@@ -1,47 +1,40 @@
-﻿using System;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.Logging;
-using NLog.Web;
+using Microsoft.OpenApi.Models;
 using NetProject.Data;
-using NetProject.Mappers;
 using NetProject.Models;
+using NetProject.DTOs; // <-- tutaj wczytujesz DTO
+using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ────────────────────────────────────────────────────────────────────────────────
-// 1) Konfiguracja NLog jako dostawcy logów
+// NLog konfiguracja
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
-// ────────────────────────────────────────────────────────────────────────────────
 
-// 2) Rejestracja DbContext (SQL Server)
+// DbContext + Identity
 builder.Services.AddDbContext<MyAppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 3) Rejestracja Identity (użytkownicy + role)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-        options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<MyAppDbContext>()
-    .AddDefaultTokenProviders();
+{
+    options.SignIn.RequireConfirmedAccount = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireDigit = false;
+})
+.AddEntityFrameworkStores<MyAppDbContext>()
+.AddDefaultTokenProviders();
 
-
-
-// Dodaj Razor Pages (bo strony logowania/ rejestracji będą w formie Razor Pages):
-builder.Services.AddRazorPages();
-
-// 4) (opcjonalnie) Rejestracja Mapperly – metody są statyczne, więc nie trzeba
-// builder.Services.AddMapperly();
-
-// 5) Rejestracja autoryzacji
+// Dodaj uwierzytelnianie i autoryzację
+builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 
-// 6) Rejestracja Swaggera (OpenAPI)
+// Swagger (do testów API)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -50,127 +43,67 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// ────────────────────────────────────────────────────────────────────────────────
-// 7) Seed ról, konta admina i przykładowych danych
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await DbInitializer.SeedRolesAndAdminAsync(services);
-    var dbContext = services.GetRequiredService<MyAppDbContext>();
-    await DbInitializer.SeedSampleDataAsync(dbContext);
-}
-// ────────────────────────────────────────────────────────────────────────────────
+// Seed ról/admina jeśli masz metodę
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+await DbInitializer.SeedRolesAndAdminAsync(services);
 
-// 8) Root endpoint – status połączenia z bazą i link do Swaggera
-//    * MapGet musi być przed UseSwaggerUI(), żeby nie nadpisywał "/"
-app.MapGet("/", async (MyAppDbContext db, ILogger<Program> logger) =>
-{
-    try
-    {
-        var canConnect = await db.Database.CanConnectAsync();
-        var status = canConnect
-            ? "✅ Połączono z bazą danych!"
-            : "❌ Nie udało się połączyć z bazą danych!";
-        logger.LogInformation("GET /  – status połączenia: {Status}", status);
-
-        var html = $@"
-          <html>
-            <body style='font-family:sans-serif'>
-              <h1>{status}</h1>
-              <p><a href=""/swagger"">Przejdź do dokumentacji API (Swagger)</a></p>
-            </body>
-          </html>";
-        return Results.Content(html, "text/html; charset=utf-8");
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "GET /  – błąd podczas sprawdzania połączenia z bazą");
-        return Results.Problem("Wewnętrzny błąd serwera");
-    }
-});
-
-// 9) Middleware Swagger (po zdefiniowaniu root endpoint)
+// Middleware Swagger
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "NetProject API v1");
-    c.RoutePrefix = "swagger"; // dostęp do Swagger UI pod /swagger
+    c.RoutePrefix = "swagger";
 });
 
-// 10) Middleware Authentication / Authorization
+// Middleware uwierzytelniania i autoryzacji
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ────────────────────────────────────────────────────────────────────────────────
+// Root przekierowujący na Swaggera
+app.MapGet("/", () => Results.Redirect("/swagger"));
 
-app.MapRazorPages();
-
-// 11) GET /api/customers  – lista klientów (CustomerDTO)
-app.MapGet("/api/customers", async (MyAppDbContext db, ILogger<Program> logger) =>
-{
-    try
-    {
-        logger.LogInformation("GET /api/customers  – pobieranie listy klientów");
-        var customers = await db.Customers.Include(c => c.Vehicles).ToListAsync();
-        var dtos = customers.Select(ModelMapper.ToCustomerDTO);
-        return Results.Ok(dtos);
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "GET /api/customers  – błąd podczas pobierania klientów");
-        return Results.Problem("Wewnętrzny błąd serwera");
-    }
-});
-
-// 12) GET /api/customers/{id}  – pojedynczy klient po ID
-app.MapGet("/api/customers/{id:int}", async (int id, MyAppDbContext db, ILogger<Program> logger) =>
-{
-    try
-    {
-        // Uwaga: używamy "{{id}}" aby zachować "{id}" literalnie w logu, i "{Id}" jako miejsce na parametr
-        logger.LogInformation("GET /api/customers/{{id}}  – pobieranie klienta o id={Id}", id);
-
-        var customer = await db.Customers
-                               .Include(c => c.Vehicles)
-                               .FirstOrDefaultAsync(c => c.Id == id);
-        if (customer == null)
-        {
-            // Tu ponownie: "{{id}}" to literalna ścieżka, a "{Id}" to placeholder na wartość
-            logger.LogWarning("GET /api/customers/{{id}}  – nie znaleziono klienta o id={Id}", id);
-            return Results.NotFound(new { message = $"Klient o id={id} nie istnieje." });
-        }
-
-        var dto = ModelMapper.ToCustomerDTO(customer);
-        return Results.Ok(dto);
-    }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "GET /api/customers/{{id}}  – błąd podczas pobierania klienta o id={Id}", id);
-        return Results.Problem("Wewnętrzny błąd serwera");
-    }
-});
-
-// 13) POST /api/customers  – tworzenie nowego klienta
-app.MapPost("/api/customers", async (
-    NetProject.DTOs.CustomerDTO dto,
-    MyAppDbContext db,
+// Endpoint rejestracji
+app.MapPost("/api/account/register", async (
+    RegisterDTO model,
+    UserManager<ApplicationUser> userManager,
     ILogger<Program> logger) =>
 {
-    try
+    if (model is null)
+        return Results.BadRequest("Brak danych rejestracji");
+
+    var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+    var result = await userManager.CreateAsync(user, model.Password);
+
+    if (!result.Succeeded)
     {
-        logger.LogInformation("POST /api/customers  – tworzenie klienta");
-        var customer = ModelMapper.ToCustomer(dto);
-        db.Customers.Add(customer);
-        await db.SaveChangesAsync();
-        logger.LogInformation("POST /api/customers  – dodano klienta o id={Id}", customer.Id);
-        return Results.Created($"/api/customers/{customer.Id}", ModelMapper.ToCustomerDTO(customer));
+        logger.LogWarning("Rejestracja nie powiodła się: {Errors}", string.Join("; ", result.Errors.Select(e => e.Description)));
+        return Results.BadRequest(result.Errors.Select(e => e.Description));
     }
-    catch (Exception ex)
-    {
-        logger.LogError(ex, "POST /api/customers  – błąd podczas tworzenia klienta");
-        return Results.Problem("Wewnętrzny błąd serwera");
-    }
+
+    logger.LogInformation("Nowy użytkownik zarejestrowany: {Email}", model.Email);
+    return Results.Ok(new { message = "Rejestracja zakończona sukcesem." });
 });
-// ────────────────────────────────────────────────────────────────────────────────
+
+// Endpoint logowania
+app.MapPost("/api/account/login", async (
+    LoginDTO model,
+    SignInManager<ApplicationUser> signInManager,
+    ILogger<Program> logger) =>
+{
+    if (model is null)
+        return Results.BadRequest("Brak danych logowania");
+
+    var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
+
+    if (!result.Succeeded)
+    {
+        logger.LogWarning("Nieudane logowanie: {Email}", model.Email);
+        return Results.BadRequest(new { message = "Niepoprawny email lub hasło." });
+    }
+
+    logger.LogInformation("Użytkownik zalogowany: {Email}", model.Email);
+    return Results.Ok(new { message = "Zalogowano pomyślnie." });
+});
 
 app.Run();

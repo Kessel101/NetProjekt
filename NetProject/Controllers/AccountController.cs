@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using NetProject.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NetProject.Controllers
 {
@@ -56,10 +57,14 @@ namespace NetProject.Controllers
             ModelState.AddModelError(string.Empty, "Invalid login attempt.");
             return View(model);
         }
-
+        
         [HttpGet]
-        public IActionResult Dashboard() => View();
-
+        [Authorize]
+        public IActionResult Dashboard()
+        {
+            return View();
+        }
+        
         [HttpPost]
         public async Task<IActionResult> Logout()
         {

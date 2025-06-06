@@ -1,9 +1,8 @@
-﻿@{
-ViewData["Title"] = "Dashboard";
-}
+﻿
 
-<h2>Welcome to your dashboard!</h2>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
 
-<form asp-action="Logout" method="post">
-    <button type="submit" class="btn btn-danger">Logout</button>
-</form>
+
+<h2>Panel użytkownika</h2>
+<p>Witaj, @User.Identity.Name!</p>
