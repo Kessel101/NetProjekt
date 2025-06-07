@@ -69,7 +69,7 @@ app.MapGet("/", (HttpContext ctx) =>
     if (ctx.User.Identity?.IsAuthenticated ?? false)
     {
         // po zalogowaniu możesz przekierować na dashboard
-        return Results.Redirect("/Account/Manage");
+        return Results.Redirect("/Identity/Account/Manage");
     }
     else
     {
