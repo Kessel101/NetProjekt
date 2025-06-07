@@ -4,7 +4,7 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
 <head>
     <meta charset="utf-8" />
     <title>@ViewData["Title"] - NetProject</title>
@@ -12,20 +12,34 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-light">
-            <div class="container">
-                <a class="navbar-brand" href="/">NetProject</a>
-                <div class="collapse navbar-collapse">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">NetProject</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav ms-auto">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            if (User.IsInRole("Admin"))
+                            @* Admin *@
+                            @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Admin" asp-action="Index">Zarządzaj użytkownikami</a>
                                 </li>
                             }
-                            
+                            @* Recepcjonista / Admin *@
+                            @if (User.IsInRole("Recepcjonista") || User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Customers" asp-action="Index">Klienci</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Customers" asp-action="Create">Dodaj klienta</a>
+                                </li>
+                            }
+                            @* Profil *@
                             <li class="nav-item">
                                 <span class="nav-link">Witaj, @User.Identity.Name!</span>
                             </li>
@@ -47,7 +61,6 @@
                                 <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Zarejestruj się</a>
                             </li>
                         }
-
                     </ul>
                 </div>
             </div>
@@ -59,5 +72,6 @@
     </div>
 
     @RenderSection("Scripts", required: false)
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

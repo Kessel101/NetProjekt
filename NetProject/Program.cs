@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NetProject.Data;
 using NetProject.Models;
@@ -28,11 +26,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<MyAppDbContext>();
 
-// Razor Pages (Identity UI)
-builder.Services.AddRazorPages();
-
-// MVC Controllers + Views (dla AdminController i innych)
-builder.Services.AddControllersWithViews();
+// ─── MVC + Razor Pages ───────────────────────────────────────────────────────────
+builder.Services.AddControllersWithViews();  // kontrolery MVC + widoki
+builder.Services.AddRazorPages();            // Identity UI (Areas/Identity)
 
 // ─── Swagger (do testów API) ────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
@@ -50,7 +46,10 @@ using (var scope = app.Services.CreateScope())
     await DbInitializer.SeedRolesAndAdminAsync(services);
 }
 
-// ─── Middleware Swagger ────────────────────────────────────────────────────────
+// ─── Middleware ─────────────────────────────────────────────────────────────────
+app.UseStaticFiles();        // aby działał ~/lib/bootstrap/css
+app.UseRouting();
+
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -58,30 +57,21 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// ─── Middleware uwierzytelniania i autoryzacji ─────────────────────────────────
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ─── Mapowanie tras MVC ─────────────────────────────────────────────────────────
+// ─── Mapowanie tras ─────────────────────────────────────────────────────────────
+// MVC
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}"
-);
-
-// ─── Mapowanie Razor Pages (Identity UI) ────────────────────────────────────────
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+// Razor Pages (Identity UI)
 app.MapRazorPages();
 
-// ─── Root: przekierowanie na stronę logowania lub Manage ───────────────────────
+// Root → przekierowanie do panelu lub logowania
 app.MapGet("/", (HttpContext ctx) =>
-{
-    if (ctx.User.Identity?.IsAuthenticated ?? false)
-    {
-        return Results.Redirect("/Identity/Account/Manage");
-    }
-    else
-    {
-        return Results.Redirect("/Identity/Account/Login");
-    }
-});
+    Results.Redirect(ctx.User.Identity?.IsAuthenticated == true
+        ? "/Identity/Account/Manage"
+        : "/Identity/Account/Login"));
 
 app.Run();

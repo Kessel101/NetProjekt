@@ -1,83 +1,36 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// File: Controllers/CustomerController.cs
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NetProject.Data;
-using NetProject.Mappers;
-using NetProject.DTOs;
+using NetProject.Models;
+using NetProject.ViewModels;
 
 namespace NetProject.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CustomersController : ControllerBase
+    [Authorize(Roles = "Recepcjonista,Admin")]
+    public class CustomersController : Controller
     {
         private readonly MyAppDbContext _db;
-        private readonly ILogger<CustomersController> _logger;
+        public CustomersController(MyAppDbContext db) => _db = db;
 
-        public CustomersController(MyAppDbContext db, ILogger<CustomersController> logger)
-        {
-            _db = db;
-            _logger = logger;
-        }
+        public async Task<IActionResult> Index()
+            => View(await _db.Customers.ToListAsync());
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            try
-            {
-                _logger.LogInformation("Wywołanie GET /api/customers");
-                var customers = await _db.Customers.Include(c => c.Vehicles).ToListAsync();
-                var dtos = customers.Select(ModelMapper.ToCustomerDTO);
-                return Ok(dtos);
-            }
-            catch (Exception ex)
-            {
-                // Zaloguj błąd, a potem zwróć status 500
-                _logger.LogError(ex, "Błąd podczas pobierania listy klientów");
-                return StatusCode(500, "Wewnętrzny błąd serwera");
-            }
-        }
+        public IActionResult Create()
+            => View();
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetById(int id)
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CustomerViewModel vm)
         {
-            try
-            {
-                _logger.LogInformation("Wywołanie GET /api/customers/{id} (id={Id})", id);
-                var customer = await _db.Customers.Include(c => c.Vehicles)
-                                                  .FirstOrDefaultAsync(c => c.Id == id);
-                if (customer == null)
-                {
-                    _logger.LogWarning("Nie znaleziono klienta o id {Id}", id);
-                    return NotFound();
-                }
-                return Ok(ModelMapper.ToCustomerDTO(customer));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Błąd podczas pobierania klienta o id {Id}", id);
-                return StatusCode(500, "Wewnętrzny błąd serwera");
-            }
-        }
-
-        // Przykład POST
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CustomerDTO dto)
-        {
-            try
-            {
-                _logger.LogInformation("Wywołanie POST /api/customers");
-                var customer = ModelMapper.ToCustomer(dto);
-                _db.Customers.Add(customer);
-                await _db.SaveChangesAsync();
-                _logger.LogInformation("Dodano nowego klienta (id={Id})", customer.Id);
-                return CreatedAtAction(nameof(GetById), new { id = customer.Id }, ModelMapper.ToCustomerDTO(customer));
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Błąd podczas tworzenia klienta");
-                return StatusCode(500, "Wewnętrzny błąd serwera");
-            }
+            if (!ModelState.IsValid) return View(vm);
+            _db.Customers.Add(new Customer {
+                FullName = vm.FullName,
+                Email    = vm.Email,
+                PhoneNumber = vm.PhoneNumber
+            });
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

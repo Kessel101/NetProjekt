@@ -1,0 +1,31 @@
+﻿@model IEnumerable<NetProject.Models.Customer>
+
+@{
+    ViewData["Title"] = "Lista klientów";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Dodaj nowego klienta</a>
+</p>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Imię i nazwisko</th>
+        <th>Email</th>
+        <th>Telefon</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model)
+    {
+        <tr>
+            <td>@c.FullName</td>
+            <td>@c.Email</td>
+            <td>@c.PhoneNumber</td>
+        </tr>
+    }
+    </tbody>
+</table>
