@@ -1,0 +1,29 @@
+name: NetProjekt CI/CD  # nazwa workflow, która będzie widoczna na liście uruchomionych przepływów na GitHubie.
+
+on: # definicja zdarzeń, które uruchamiają workflow.
+  push:
+    branches: [ main ] # definicja gałęzi, na których workflow będzie uruchamiany.
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # definicja środowiska wykonawczego, na którym będzie uruchamiany workflow.
+
+    steps:
+    - name: Checkout repository # krok, który klonuje repozytorium z GitHuba.
+      uses: actions/checkout@v3 # używa akcji checkout do klonowania repozytorium.
+
+    - name: Setup .NET SDK # krok, który instaluje odpowiednią wersję .NET SDK.
+      uses: actions/setup-dotnet@v3 # używa akcji setup-dotnet do instalacji odpowiedniej wersji .NET SDK.
+      with:
+        dotnet-version: '9.0.201' # jaka wersja .NET SDK
+
+    - name: Restore dependencies # krok, który przywraca zależności projektu.
+      run: dotnet restore # uruchamia polecenie dotnet restore do przywracania zależności.
+
+    - name: Build project # krok, który buduje projekt.
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Run tests # krok, który uruchamia testy.
+      run: dotnet test --no-build --verbosity normal
