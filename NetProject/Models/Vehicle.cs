@@ -19,7 +19,7 @@ namespace NetProject.Models
         public string RegistrationNumber { get; set; } = string.Empty;
 
         [Required]
-        public int Year { get; set; }   // <--- DODAJ TO
+        public int Year { get; set; }
 
         public string? ImageUrl { get; set; }
 

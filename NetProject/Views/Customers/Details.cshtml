@@ -19,6 +19,7 @@
     <table class="table">
         <thead>
         <tr>
+            <th>Zdjęcie</th>
             <th>Marka</th>
             <th>Model</th>
             <th>VIN</th>
@@ -30,6 +31,12 @@
         @foreach (var v in Model.Vehicles)
         {
             <tr>
+                <td>
+                    @if (!string.IsNullOrEmpty(v.ImageUrl))
+                    {
+                        <img src="@Url.Content(v.ImageUrl)" alt="Zdjęcie pojazdu" style="max-height: 100px;" />
+                    }
+                </td>
                 <td>@v.Make</td>
                 <td>@v.Model</td>
                 <td>@v.VIN</td>

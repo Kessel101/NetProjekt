@@ -27,5 +27,7 @@ namespace NetProject.ViewModels
         [Range(1900, 2100)]
         [Display(Name = "Rok produkcji")]
         public int Year { get; set; }
+        
+        public IFormFile? ImageFile  { get; set; }
     }
 }
