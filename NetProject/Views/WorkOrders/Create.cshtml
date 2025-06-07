@@ -1,0 +1,41 @@
+﻿@model NetProject.ViewModels.WorkOrderViewModel
+
+@{
+    ViewData["Title"] = "Nowe zlecenie";
+}
+
+<h1>Nowe zlecenie</h1>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="CustomerId" class="form-label">Klient</label>
+        <select asp-for="CustomerId" class="form-select" asp-items="@(new SelectList(Model.Customers, "Id", "FullName"))"></select>
+        <span asp-validation-for="CustomerId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="VehicleId" class="form-label">Pojazd</label>
+        <select asp-for="VehicleId" class="form-select" asp-items="@(new SelectList(Model.Vehicles, "Id", "Model"))"></select>
+        <span asp-validation-for="VehicleId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Opis problemu</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AssignedMechanicId" class="form-label">Mechanik</label>
+        <select asp-for="AssignedMechanicId" class="form-select" asp-items="@(new SelectList(Model.Mechanics, "Id", "UserName"))"></select>
+        <span asp-validation-for="AssignedMechanicId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Utwórz zlecenie</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

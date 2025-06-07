@@ -1,0 +1,33 @@
+﻿@model IEnumerable<NetProject.Models.WorkOrder>
+
+@{
+    ViewData["Title"] = "Lista zleceń";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th>Klient</th>
+        <th>Pojazd</th>
+        <th>Opis</th>
+        <th>Mechanik</th>
+        <th>Status</th>
+        <th>Data</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Customer.FullName</td>
+            <td>@item.Vehicle.Make @item.Vehicle.Model</td>
+            <td>@item.Description</td>
+            <td>@item.AssignedMechanic.UserName</td>
+            <td>@item.Status</td>
+            <td>@item.CreatedAt.ToShortDateString()</td>
+        </tr>
+    }
+    </tbody>
+</table>

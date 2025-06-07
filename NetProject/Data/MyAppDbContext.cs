@@ -19,16 +19,31 @@ namespace NetProject.Data
         public DbSet<Part> Parts { get; set; }
         public DbSet<UsedPart> UsedParts { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<WorkOrder> WorkOrders { get; set; }
+
 
         // Opcjonalnie konfiguracje np. relacji kluczowych
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<UsedPart>()
-                .HasOne(up => up.Part)
+            builder.Entity<WorkOrder>()
+                .HasOne(w => w.Vehicle)
                 .WithMany()
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(w => w.VehicleId)
+                .OnDelete(DeleteBehavior.Restrict); // ✅ to dodaj
+
+            builder.Entity<WorkOrder>()
+                .HasOne(w => w.Customer)
+                .WithMany()
+                .HasForeignKey(w => w.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict); // ✅ to dodaj
+
+            builder.Entity<WorkOrder>()
+                .HasOne(w => w.AssignedMechanic)
+                .WithMany()
+                .HasForeignKey(w => w.AssignedMechanicId)
+                .OnDelete(DeleteBehavior.Restrict); // ✅ to dodaj
         }
     }
 }
