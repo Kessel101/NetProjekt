@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace NetProject.Models
 {
@@ -8,15 +8,14 @@ namespace NetProject.Models
         public int Id { get; set; }
 
         [Required]
-        public string Description { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
 
+        [Required]
         [Range(0, double.MaxValue)]
         public decimal LaborCost { get; set; }
 
-        // Relacja z zleceniem
-        public int ServiceOrderId { get; set; }
-        public ServiceOrder ServiceOrder { get; set; }
-
-        public List<UsedPart> UsedParts { get; set; } = new();
+        [ForeignKey("WorkOrder")]
+        public int WorkOrderId { get; set; }
+        public WorkOrder WorkOrder { get; set; }
     }
 }

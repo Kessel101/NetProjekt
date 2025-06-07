@@ -1,32 +1,45 @@
-﻿@model IEnumerable<NetProject.Models.WorkOrder>
+﻿@using NetProject.Models
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
+@model IEnumerable<WorkOrder>
 @{
     ViewData["Title"] = "Lista zleceń";
 }
 
 <h1>@ViewData["Title"]</h1>
+@if (User.IsInRole("Recepcjonista") || User.IsInRole("Admin"))
+{
+    <a class="btn btn-success mb-3" asp-action="Create">Utwórz nowe zlecenie</a>
+}
 
 <table class="table">
     <thead>
     <tr>
+        <th>Id</th>
         <th>Klient</th>
         <th>Pojazd</th>
-        <th>Opis</th>
         <th>Mechanik</th>
         <th>Status</th>
-        <th>Data</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model)
+    @foreach (var o in Model)
     {
         <tr>
-            <td>@item.Customer.FullName</td>
-            <td>@item.Vehicle.Make @item.Vehicle.Model</td>
-            <td>@item.Description</td>
-            <td>@item.AssignedMechanic.UserName</td>
-            <td>@item.Status</td>
-            <td>@item.CreatedAt.ToShortDateString()</td>
+            <td>@o.Id</td>
+            <td>@o.Customer.FullName</td>
+            <td>@o.Vehicle.Make @o.Vehicle.Model</td>
+            <td>@o.AssignedMechanic?.UserName</td>
+            <td>@o.Status</td>
+            <td>
+                <a asp-action="Details" asp-route-id="@o.Id">Szczegóły</a>
+                @if (User.IsInRole("Recepcjonista") || User.IsInRole("Admin") || User.IsInRole("Mechanik"))
+                {
+                    @: |
+                    <a asp-action="Edit" asp-route-id="@o.Id">Edytuj</a>
+                }
+            </td>
         </tr>
     }
     </tbody>

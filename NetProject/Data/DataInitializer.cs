@@ -69,7 +69,7 @@ namespace NetProject.Data
                 UnitPrice = 300
             };
 
-            var serviceOrder = new ServiceOrder
+            /*var serviceOrder = new ServiceOrder
             {
                 Vehicle = vehicle,
                 Status = "Nowe",
@@ -97,11 +97,11 @@ namespace NetProject.Data
                         AuthorId = null
                     }
                 }
-            };
+            };*/
 
             await context.Customers.AddAsync(customer);
             await context.Parts.AddAsync(part);
-            await context.ServiceOrders.AddAsync(serviceOrder);
+            //await context.ServiceOrders.AddAsync(serviceOrder);
 
             await context.SaveChangesAsync();
         }

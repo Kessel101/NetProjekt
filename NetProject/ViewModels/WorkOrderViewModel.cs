@@ -5,16 +5,39 @@ namespace NetProject.ViewModels
 {
     public class WorkOrderViewModel
     {
-        [Required] public int CustomerId { get; set; }
+        public int Id { get; set; }
 
-        [Required] public int VehicleId { get; set; }
+        [Required]
+        [Display(Name = "Klient")]
+        public int CustomerId { get; set; }
 
-        [Required] public string Description { get; set; }
+        [Required]
+        [Display(Name = "Pojazd")]
+        public int VehicleId { get; set; }
 
-        [Required] public string AssignedMechanicId { get; set; }
+        [Required]
+        [Display(Name = "Opis problemu")]
+        public string Description { get; set; } = string.Empty;
 
-        public IEnumerable<Customer>? Customers { get; set; }
-        public IEnumerable<Vehicle>? Vehicles { get; set; }
-        public IEnumerable<ApplicationUser>? Mechanics { get; set; }
+        [Required]
+        [Display(Name = "Mechanik")]
+        public string AssignedMechanicId { get; set; } = string.Empty;
+
+        [Required]
+        [Display(Name = "Status")]
+        public string Status { get; set; } = string.Empty;
+
+        // Do wypełnienia dropdownów
+        public IEnumerable<Customer> Customers { get; set; } = Enumerable.Empty<Customer>();
+        public IEnumerable<Vehicle> Vehicles   { get; set; } = Enumerable.Empty<Vehicle>();
+        public IEnumerable<ApplicationUser> Mechanics { get; set; } = Enumerable.Empty<ApplicationUser>();
+        
+        public List<string> AvailableStatuses { get; set; } = new()
+        {
+            "Nowe",
+            "W trakcie",
+            "Zakończone",
+            "Anulowane"
+        };
     }
 }

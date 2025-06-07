@@ -1,0 +1,43 @@
+﻿@model NetProject.ViewModels.WorkOrderViewModel
+@{
+    ViewData["Title"] = "Edytuj zlecenie";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <input asp-for="Id" type="hidden" />
+
+    <div class="mb-3">
+        <label asp-for="CustomerId" class="form-label">Klient</label>
+        <select asp-for="CustomerId" asp-items="@(new SelectList(Model.Customers, "Id", "FullName"))" class="form-select"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="VehicleId" class="form-label">Pojazd</label>
+        <select asp-for="VehicleId" asp-items="@(new SelectList(Model.Vehicles, "Id", "Make"))" class="form-select"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">Opis</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AssignedMechanicId" class="form-label">Mechanik</label>
+        <select asp-for="AssignedMechanicId" asp-items="@(new SelectList(Model.Mechanics, "Id", "UserName"))" class="form-select"></select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Status" class="form-label">Status</label>
+        <select asp-for="Status"
+                asp-items="@(new SelectList(Model.AvailableStatuses))"
+                class="form-select">
+            <option value="">— wybierz status —</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+    <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+</form>

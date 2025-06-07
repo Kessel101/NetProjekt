@@ -1,39 +1,41 @@
 ﻿@model NetProject.ViewModels.WorkOrderViewModel
-
 @{
-    ViewData["Title"] = "Nowe zlecenie";
+    var isEdit = Model.Id > 0;
+    ViewData["Title"] = isEdit ? "Edytuj zlecenie" : "Utwórz zlecenie";
 }
 
-<h1>Nowe zlecenie</h1>
+<h1>@ViewData["Title"]</h1>
 
-<form asp-action="Create" method="post">
+<form asp-action="@(isEdit ? "Edit" : "Create")" method="post">
     @Html.AntiForgeryToken()
+    @if (isEdit)
+    {
+        <input asp-for="Id" type="hidden" />
+    }
 
     <div class="mb-3">
-        <label asp-for="CustomerId" class="form-label">Klient</label>
+        <label asp-for="CustomerId"></label>
         <select asp-for="CustomerId" class="form-select" asp-items="@(new SelectList(Model.Customers, "Id", "FullName"))"></select>
-        <span asp-validation-for="CustomerId" class="text-danger"></span>
     </div>
-
     <div class="mb-3">
-        <label asp-for="VehicleId" class="form-label">Pojazd</label>
+        <label asp-for="VehicleId"></label>
         <select asp-for="VehicleId" class="form-select" asp-items="@(new SelectList(Model.Vehicles, "Id", "Model"))"></select>
-        <span asp-validation-for="VehicleId" class="text-danger"></span>
     </div>
-
     <div class="mb-3">
-        <label asp-for="Description" class="form-label">Opis problemu</label>
+        <label asp-for="Description"></label>
         <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-
     <div class="mb-3">
-        <label asp-for="AssignedMechanicId" class="form-label">Mechanik</label>
+        <label asp-for="AssignedMechanicId"></label>
         <select asp-for="AssignedMechanicId" class="form-select" asp-items="@(new SelectList(Model.Mechanics, "Id", "UserName"))"></select>
-        <span asp-validation-for="AssignedMechanicId" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Status"></label>
+        <input asp-for="Status" class="form-control" />
     </div>
 
-    <button type="submit" class="btn btn-primary">Utwórz zlecenie</button>
+    <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+    <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
 </form>
 
 @section Scripts {

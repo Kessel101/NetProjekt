@@ -1,0 +1,44 @@
+﻿@model NetProject.Models.WorkOrder
+@{
+    ViewData["Title"] = "Szczegóły zlecenia";
+}
+
+<h1>@ViewData["Title"] — Zlecenie #@Model.Id</h1>
+
+<p><strong>Klient:</strong> @Model.Customer.FullName</p>
+<p><strong>Pojazd:</strong> @Model.Vehicle.Make @Model.Vehicle.Model</p>
+<p><strong>Mechanik:</strong> @Model.AssignedMechanic?.UserName</p>
+<p><strong>Status:</strong> @Model.Status</p>
+<p><strong>Opis:</strong> @Model.Description</p>
+
+<hr />
+<h4>Czynności serwisowe</h4>
+<table class="table">
+    <thead><tr><th>Nazwa</th><th>Koszt robocizny</th></tr></thead>
+    <tbody>
+    @foreach (var t in Model.ServiceTasks)
+    {
+        <tr>
+            <td>@t.Name</td>
+            <td>@t.LaborCost zł</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (User.IsInRole("Mechanik") || User.IsInRole("Admin"))
+{
+    <a asp-controller="ServiceTasks"
+       asp-action="Create"
+       asp-route-workOrderId="@Model.Id"
+       class="btn btn-sm btn-success">Dodaj czynność</a>
+}
+
+<hr />
+
+@if (User.IsInRole("Recepcjonista") || User.IsInRole("Admin"))
+{
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edytuj zlecenie</a>
+}
+
+<a asp-action="Index" class="btn btn-secondary">Powrót do listy</a>
