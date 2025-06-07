@@ -1,30 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace NetProject.Models
+namespace NetProject.ViewModels
 {
-    public class Vehicle
+    public class VehicleViewModel
     {
-        public int Id { get; set; }
+        [Required]
+        public int CustomerId { get; set; }
 
         [Required]
+        [Display(Name = "Marka")]
         public string Make { get; set; } = string.Empty;
 
         [Required]
+        [Display(Name = "Model")]
         public string Model { get; set; } = string.Empty;
 
         [Required]
+        [Display(Name = "VIN")]
         public string VIN { get; set; } = string.Empty;
 
         [Required]
+        [Display(Name = "Nr rejestracyjny")]
         public string RegistrationNumber { get; set; } = string.Empty;
 
         [Required]
-        public int Year { get; set; }   // <--- DODAJ TO
-
-        public string? ImageUrl { get; set; }
-
-        public int CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        [Range(1900, 2100)]
+        [Display(Name = "Rok produkcji")]
+        public int Year { get; set; }
     }
-
 }

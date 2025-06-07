@@ -1,0 +1,55 @@
+﻿@model NetProject.Models.Customer
+
+@{
+    ViewData["Title"] = "Profil klienta";
+}
+
+<h1>Profil: @Model.FullName</h1>
+<p><strong>Email:</strong> @Model.Email</p>
+<p><strong>Telefon:</strong> @Model.PhoneNumber</p>
+
+<hr />
+
+<a asp-action="Index" class="btn btn-secondary mt-3">Powrót do listy klientów</a>
+
+<h2>Pojazdy</h2>
+
+@if (Model.Vehicles != null && Model.Vehicles.Any())
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Marka</th>
+            <th>Model</th>
+            <th>VIN</th>
+            <th>Rejestracja</th>
+            <th>Rok</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var v in Model.Vehicles)
+        {
+            <tr>
+                <td>@v.Make</td>
+                <td>@v.Model</td>
+                <td>@v.VIN</td>
+                <td>@v.RegistrationNumber</td>
+                <td>@v.Year</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Brak pojazdów przypisanych do tego klienta.</p>
+}
+
+<a class="btn btn-primary"
+   asp-controller="Vehicles"
+   asp-action="Create"
+   asp-route-customerId="@Model.Id">
+    Dodaj nowy pojazd
+</a>
+
+

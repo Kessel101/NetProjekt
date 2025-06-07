@@ -1,0 +1,45 @@
+﻿@model NetProject.ViewModels.VehicleViewModel
+
+@{
+    ViewData["Title"] = "Dodaj pojazd";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post" class="needs-validation" novalidate>
+    @Html.AntiForgeryToken()
+    <input asp-for="CustomerId" type="hidden" />
+
+    <div class="mb-3">
+        <label asp-for="Make" class="form-label"></label>
+        <input asp-for="Make" class="form-control" />
+        <span asp-validation-for="Make" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Model" class="form-label"></label>
+        <input asp-for="Model" class="form-control" />
+        <span asp-validation-for="Model" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="VIN" class="form-label"></label>
+        <input asp-for="VIN" class="form-control" />
+        <span asp-validation-for="VIN" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="RegistrationNumber" class="form-label"></label>
+        <input asp-for="RegistrationNumber" class="form-control" />
+        <span asp-validation-for="RegistrationNumber" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Year" class="form-label"></label>
+        <input asp-for="Year" class="form-control" />
+        <span asp-validation-for="Year" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Zapisz</button>
+    <a asp-controller="Customers" asp-action="Details" asp-route-id="@Model.CustomerId" class="btn btn-secondary">Anuluj</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
