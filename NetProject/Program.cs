@@ -1,4 +1,3 @@
-﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -7,34 +6,33 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using NetProject.Data;
 using NetProject.Models;
-using NetProject.DTOs; // <-- tutaj wczytujesz DTO
 using NLog.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// NLog konfiguracja
+// ─── NLog ───────────────────────────────────────────────────────────────────────
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
-// DbContext + Identity
+// ─── DbContext + Identity + UI ─────────────────────────────────────────────────
 builder.Services.AddDbContext<MyAppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
-{
-    options.SignIn.RequireConfirmedAccount = false;
-    options.Password.RequireNonAlphanumeric = false;
-    options.Password.RequireUppercase = false;
-    options.Password.RequireDigit = false;
-})
-.AddEntityFrameworkStores<MyAppDbContext>()
-.AddDefaultTokenProviders();
+// Dodaj Identity wraz z domyślnym UI (Razor Pages w Areas/Identity)
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+    {
+        options.SignIn.RequireConfirmedAccount = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireDigit = false;
+    })
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<MyAppDbContext>();
 
-// Dodaj uwierzytelnianie i autoryzację
-builder.Services.AddAuthentication();
-builder.Services.AddAuthorization();
+// Razor Pages (trzeba do obsługi Identity UI)
+builder.Services.AddRazorPages();
 
-// Swagger (do testów API)
+// ─── Swagger (do testów API) ────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -43,12 +41,14 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Seed ról/admina jeśli masz metodę
-using var scope = app.Services.CreateScope();
-var services = scope.ServiceProvider;
-await DbInitializer.SeedRolesAndAdminAsync(services);
+// ─── Seed ról i admina ──────────────────────────────────────────────────────────
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DbInitializer.SeedRolesAndAdminAsync(services);
+}
 
-// Middleware Swagger
+// ─── Middleware Swagger ────────────────────────────────────────────────────────
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
@@ -56,54 +56,28 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "swagger";
 });
 
-// Middleware uwierzytelniania i autoryzacji
+// ─── Middleware uwierzytelniania i autoryzacji ─────────────────────────────────
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Root przekierowujący na Swaggera
-app.MapGet("/", () => Results.Redirect("/swagger"));
+// ─── Mapowanie Razor Pages (Identity UI znajduje się w Areas/Identity) ─────────
+app.MapRazorPages();
 
-// Endpoint rejestracji
-app.MapPost("/api/account/register", async (
-    RegisterDTO model,
-    UserManager<ApplicationUser> userManager,
-    ILogger<Program> logger) =>
+// ─── Root: przekierowanie na stronę logowania lub swaggera ─────────────────────
+app.MapGet("/", (HttpContext ctx) =>
 {
-    if (model is null)
-        return Results.BadRequest("Brak danych rejestracji");
-
-    var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
-    var result = await userManager.CreateAsync(user, model.Password);
-
-    if (!result.Succeeded)
+    if (ctx.User.Identity?.IsAuthenticated ?? false)
     {
-        logger.LogWarning("Rejestracja nie powiodła się: {Errors}", string.Join("; ", result.Errors.Select(e => e.Description)));
-        return Results.BadRequest(result.Errors.Select(e => e.Description));
+        // po zalogowaniu możesz przekierować na dashboard
+        return Results.Redirect("/Account/Manage");
     }
-
-    logger.LogInformation("Nowy użytkownik zarejestrowany: {Email}", model.Email);
-    return Results.Ok(new { message = "Rejestracja zakończona sukcesem." });
+    else
+    {
+        // niezalogowani idą do logowania
+        return Results.Redirect("/Identity/Account/Login");
+    }
 });
 
-// Endpoint logowania
-app.MapPost("/api/account/login", async (
-    LoginDTO model,
-    SignInManager<ApplicationUser> signInManager,
-    ILogger<Program> logger) =>
-{
-    if (model is null)
-        return Results.BadRequest("Brak danych logowania");
-
-    var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, isPersistent: false, lockoutOnFailure: false);
-
-    if (!result.Succeeded)
-    {
-        logger.LogWarning("Nieudane logowanie: {Email}", model.Email);
-        return Results.BadRequest(new { message = "Niepoprawny email lub hasło." });
-    }
-
-    logger.LogInformation("Użytkownik zalogowany: {Email}", model.Email);
-    return Results.Ok(new { message = "Zalogowano pomyślnie." });
-});
+// (Opcjonalnie) twoje minimal API pozostaje tutaj…
 
 app.Run();
