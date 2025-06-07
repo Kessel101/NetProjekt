@@ -18,7 +18,6 @@ builder.Host.UseNLog();
 builder.Services.AddDbContext<MyAppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Dodaj Identity wraz z domyślnym UI (Razor Pages w Areas/Identity)
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
@@ -29,8 +28,11 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<MyAppDbContext>();
 
-// Razor Pages (trzeba do obsługi Identity UI)
+// Razor Pages (Identity UI)
 builder.Services.AddRazorPages();
+
+// MVC Controllers + Views (dla AdminController i innych)
+builder.Services.AddControllersWithViews();
 
 // ─── Swagger (do testów API) ────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
@@ -60,24 +62,26 @@ app.UseSwaggerUI(c =>
 app.UseAuthentication();
 app.UseAuthorization();
 
-// ─── Mapowanie Razor Pages (Identity UI znajduje się w Areas/Identity) ─────────
+// ─── Mapowanie tras MVC ─────────────────────────────────────────────────────────
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}"
+);
+
+// ─── Mapowanie Razor Pages (Identity UI) ────────────────────────────────────────
 app.MapRazorPages();
 
-// ─── Root: przekierowanie na stronę logowania lub swaggera ─────────────────────
+// ─── Root: przekierowanie na stronę logowania lub Manage ───────────────────────
 app.MapGet("/", (HttpContext ctx) =>
 {
     if (ctx.User.Identity?.IsAuthenticated ?? false)
     {
-        // po zalogowaniu możesz przekierować na dashboard
         return Results.Redirect("/Identity/Account/Manage");
     }
     else
     {
-        // niezalogowani idą do logowania
         return Results.Redirect("/Identity/Account/Login");
     }
 });
-
-// (Opcjonalnie) twoje minimal API pozostaje tutaj…
 
 app.Run();

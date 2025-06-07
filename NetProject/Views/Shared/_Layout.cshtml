@@ -19,6 +19,13 @@
                     <ul class="navbar-nav ms-auto">
                         @if (SignInManager.IsSignedIn(User))
                         {
+                            if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Admin" asp-action="Index">Zarządzaj użytkownikami</a>
+                                </li>
+                            }
+                            
                             <li class="nav-item">
                                 <span class="nav-link">Witaj, @User.Identity.Name!</span>
                             </li>

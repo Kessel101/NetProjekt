@@ -1,0 +1,38 @@
+﻿@model List<NetProject.ViewModels.UserWithRolesViewModel>
+
+    @{
+    ViewData["Title"] = "Zarządzanie użytkownikami";
+    }
+
+    <h1>@ViewData["Title"]</h1>
+
+    <form asp-action="Index" method="post">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>Imię i nazwisko</th>
+                <th>Rola</th>
+            </tr>
+            </thead>
+            <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+            <tr>
+                <td>
+                    @Model[i].Email
+                    <input type="hidden" asp-for="@Model[i].Id" />
+                </td>
+                <td>@Model[i].FullName</td>
+                <td>
+                    <select asp-for="@Model[i].SelectedRole"
+                            asp-items="new SelectList(Model[i].AllRoles)">
+                        <option value="">(Brak)</option>
+                    </select>
+                </td>
+            </tr>
+            }
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Zapisz zmiany</button>
+    </form>
