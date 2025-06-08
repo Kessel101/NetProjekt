@@ -15,5 +15,9 @@ namespace NetProject.Mappers
 
         public static partial ServiceOrderDTO ToServiceOrderDTO(ServiceOrder order);
         public static partial ServiceOrder ToServiceOrder(ServiceOrderDTO orderDto);
+
+        public static partial PartDTO ToPartDTO(Part part);
+        public static partial Part ToPart(PartDTO partDto);
+
     }
 }

@@ -1,0 +1,23 @@
+@model NetProject.Models.Part
+
+@{
+    ViewData["Title"] = "Usuń część";
+}
+
+<h1>Czy na pewno chcesz usunąć tę część?</h1>
+
+<div>
+    <h4>@Model.Name</h4>
+    <p><strong>Typ:</strong> @Model.Type</p>
+    <p><strong>Cena:</strong> @Model.UnitPrice</p>
+    <p><strong>Ilość:</strong> @Model.Quantity</p>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Usuń</button>
+        <a asp-action="Index" class="btn btn-secondary">Anuluj</a>
+    </form>
+</div>
+
+<hr />
+<a asp-action="Index">Wróć do listy części</a>

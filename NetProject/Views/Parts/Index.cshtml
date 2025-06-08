@@ -1,0 +1,36 @@
+@model IEnumerable<NetProject.Models.Part>
+
+@{
+    ViewData["Title"] = "Części";
+}
+
+<h1>Lista części</h1>
+
+<a class="btn btn-primary mb-3" asp-action="Create">Dodaj nową część</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nazwa</th>
+            <th>Typ</th>
+            <th>Cena</th>
+            <th>Ilość</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Type</td>
+            <td>@item.UnitPrice</td>
+            <td>@item.Quantity</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edytuj</a>
+                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Usuń</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

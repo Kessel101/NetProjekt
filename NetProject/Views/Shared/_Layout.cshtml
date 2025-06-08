@@ -27,14 +27,15 @@
                                     <a class="nav-link" asp-controller="Admin" asp-action="Index">Zarządzaj użytkownikami</a>
                                 </li>
                             }
+
                             @* Recepcjonista i Admin *@
                             @if (User.IsInRole("Recepcjonista") || User.IsInRole("Admin"))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Customers" asp-action="Index">Klienci</a>
+                                    <a class="nav-link" asp-controller="Customers" asp-action="Create">Dodaj klienta</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Customers" asp-action="Create">Dodaj klienta</a>
+                                    <a class="nav-link" asp-controller="Parts" asp-action="Index">Katalog części</a>
                                 </li>
                             }
                             @* Mechanik, Admin i Recepcjonista: link do zleceń *@
@@ -42,6 +43,9 @@
                                  || User.IsInRole("Recepcjonista") 
                                  || User.IsInRole("Admin"))
                             {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Customers" asp-action="Index">Klienci</a>
+                                </li>
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="WorkOrders" asp-action="Index">Zlecenia</a>
                                 </li>
