@@ -72,16 +72,6 @@ namespace NetProject.Controllers
             return View(part);
         }
 
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var part = await _db.Parts.FirstOrDefaultAsync(m => m.Id == id);
-            if (part == null) return NotFound();
-
-            return View(part);
-        }
-
         // ZAMIANA DeleteConfirmed na Delete POST
         [HttpPost]
         [ValidateAntiForgeryToken]

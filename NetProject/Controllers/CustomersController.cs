@@ -7,16 +7,17 @@ using NetProject.ViewModels;
 
 namespace NetProject.Controllers
 {
-    [Authorize(Roles = "Recepcjonista,Admin")]
     public class CustomersController : Controller
     {
         private readonly MyAppDbContext _db;
         public CustomersController(MyAppDbContext db) => _db = db;
 
+        [Authorize(Roles = "Mechanik,Recepcjonista,Admin")]
         public async Task<IActionResult> Index()
             => View(await _db.Customers.ToListAsync());
 
         // Szczegóły klienta - ładowanie pojazdów włącznie
+        [Authorize(Roles = "Mechanik,Recepcjonista,Admin")]
         public async Task<IActionResult> Details(int id)
         {
             var customer = await _db.Customers
@@ -29,9 +30,12 @@ namespace NetProject.Controllers
             return View(customer);
         }
 
+        [Authorize(Roles = "Recepcjonista,Admin")]
+
         public IActionResult Create()
             => View();
 
+        [Authorize(Roles = "Recepcjonista,Admin")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CustomerViewModel vm)
         {
@@ -46,6 +50,26 @@ namespace NetProject.Controllers
 
             await _db.SaveChangesAsync();
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize(Roles = "Recepcjonista,Admin")]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+            var customer = await _db.Customers.FindAsync(id);
+            if (customer == null) return NotFound();
+            return View(customer);
+        }
+
+        [Authorize(Roles = "Recepcjonista,Admin")]
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var customer = await _db.Customers.FindAsync(id);
+            _db.Customers.Remove(customer);
+            await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
     }

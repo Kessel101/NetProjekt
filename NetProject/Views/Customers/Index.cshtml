@@ -21,6 +21,7 @@
             <td>@customer.PhoneNumber</td>
             <td>
                 <a asp-action="Details" asp-route-id="@customer.Id" class="btn btn-info btn-sm">Profil</a>
+                <a asp-action="Delete" asp-route-id="@customer.Id" class="btn btn-danger btn-sm">Usuń</a>
                 <!-- inne akcje jeśli potrzebujesz -->
             </td>
         </tr>
