@@ -1,0 +1,62 @@
+@model NetProject.ViewModels.MonthlySummaryReportViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<h2>Podsumowanie napraw w miesiącu</h2>
+
+<form method="get">
+    <div class="row g-3">
+        <div class="col-md-3">
+            <label>Miesiąc</label>
+            <select name="month" class="form-control">
+            @foreach(var m in (List<SelectListItem>)ViewBag.Months)
+            {
+                <option value="@m.Value" selected="@(m.Selected ? "selected":null)">@m.Text</option>
+            }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label>Rok</label>
+            <select name="year" class="form-control">
+            @foreach(var y in (List<SelectListItem>)ViewBag.Years)
+            {
+                <option value="@y.Value" selected="@(y.Selected ? "selected":null)">@y.Text</option>
+            }
+            </select>
+        </div>
+        <div class="col-md-6 align-self-end">
+            <button class="btn btn-primary">Pokaż</button>
+            <button type="submit" name="pdf" value="true" class="btn btn-secondary">Pobierz PDF</button>
+        </div>
+    </div>
+</form>
+
+@if (Model.Items.Any())
+{
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr><th>Klient</th><th>Pojazd</th><th>Liczba zleceń</th><th>Suma kosztów</th></tr>
+        </thead>
+        <tbody>
+        @foreach(var i in Model.Items)
+        {
+            <tr>
+                <td>@i.CustomerName</td>
+                <td>@i.VehicleReg</td>
+                <td>@i.OrderCount</td>
+                <td>@i.TotalCost:C</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2">Razem</th>
+                <th>@Model.TotalOrders</th>
+                <th>@Model.GrandTotalCost:C</th>
+            </tr>
+        </tfoot>
+    </table>
+}
+else
+{
+    <p class="mt-4">Brak danych dla wybranych filtrów.</p>
+}

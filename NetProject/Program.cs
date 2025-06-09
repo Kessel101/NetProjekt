@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using QuestPDF.Infrastructure;
 using NetProject.Data;
 using NetProject.Models;
 using NLog.Web;
@@ -73,5 +74,7 @@ app.MapGet("/", (HttpContext ctx) =>
     Results.Redirect(ctx.User.Identity?.IsAuthenticated == true
         ? "/Identity/Account/Manage"
         : "/Identity/Account/Login"));
+
+QuestPDF.Settings.License = LicenseType.Community;
 
 app.Run();

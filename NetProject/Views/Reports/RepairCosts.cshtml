@@ -1,0 +1,58 @@
+@model NetProject.ViewModels.RepairCostReportViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+<h2>Raport kosztów napraw</h2>
+
+<form method="get">
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label>Pojazd</label>
+            @Html.DropDownList("vehicleId", (SelectList)ViewBag.Vehicles, "Wszystkie", new { @class="form-control" })
+        </div>
+        <div class="col-md-2">
+            <label>Miesiąc</label>
+            <input type="number" name="month" min="1" max="12" value="@Model.Month" class="form-control" />
+        </div>
+        <div class="col-md-2">
+            <label>Rok</label>
+            <input type="number" name="year" value="@Model.Year" class="form-control" />
+        </div>
+        <div class="col-md-4 align-self-end">
+            <button class="btn btn-primary">Pokaż</button>
+            <button type="submit" name="pdf" value="true" class="btn btn-secondary">Pobierz PDF</button>
+        </div>
+    </div>
+</form>
+
+@if (Model.Items.Any())
+{
+    <table class="table table-striped mt-4">
+        <thead>
+            <tr><th>Data</th><th>Zadanie</th><th>Robocizna</th><th>Części</th><th>Razem</th></tr>
+        </thead>
+        <tbody>
+        @foreach(var i in Model.Items)
+        {
+            <tr>
+                <td>@i.Date:yyyy-MM-dd</td>
+                <td>@i.TaskName</td>
+                <td>@i.LaborCost:C</td>
+                <td>@i.PartsCost:C</td>
+                <td>@i.TotalCost:C</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+            <tr>
+                <th colspan="2">Suma</th>
+                <th>@Model.TotalLabor:C</th>
+                <th>@Model.TotalParts:C</th>
+                <th>@Model.GrandTotal:C</th>
+            </tr>
+        </tfoot>
+    </table>
+}
+else
+{
+    <p class="mt-4">Brak danych dla wybranych filtrów.</p>
+}
