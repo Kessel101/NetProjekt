@@ -1,35 +1,29 @@
 ﻿@model NetProject.ViewModels.ServiceTaskViewModel
-
 @{
     ViewData["Title"] = "Dodaj czynność serwisową";
 }
 
 <h1>@ViewData["Title"]</h1>
 
-<form asp-action="Create" method="post" class="needs-validation" novalidate>
-    @Html.AntiForgeryToken()
-    <input asp-for="WorkOrderId" type="hidden" />
+<form asp-action="Create">
+    <input type="hidden" asp-for="WorkOrderId" />
 
-    <div class="mb-3">
-        <label asp-for="Name" class="form-label"></label>
+    <div class="form-group">
+        <label asp-for="Name"></label>
         <input asp-for="Name" class="form-control" />
         <span asp-validation-for="Name" class="text-danger"></span>
     </div>
-    <div class="mb-3">
-        <label asp-for="LaborCost" class="form-label"></label>
+
+    <div class="form-group">
+        <label asp-for="LaborCost"></label>
         <input asp-for="LaborCost" class="form-control" />
         <span asp-validation-for="LaborCost" class="text-danger"></span>
     </div>
 
-    <button type="submit" class="btn btn-success">Dodaj</button>
-    <a asp-controller="WorkOrders"
-       asp-action="Details"
-       asp-route-id="@Model.WorkOrderId"
-       class="btn btn-secondary">
-        Powrót do zlecenia
-    </a>
+    <button type="submit" class="btn btn-primary">Dodaj</button>
+    <a asp-controller="WorkOrders" asp-action="Details" asp-route-id="@Model.WorkOrderId" class="btn btn-secondary">Anuluj</a>
 </form>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

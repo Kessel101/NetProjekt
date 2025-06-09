@@ -17,6 +17,7 @@ namespace NetProject.Data
         public DbSet<ServiceOrder> ServiceOrders { get; set; }
         public DbSet<ServiceTask> ServiceTasks { get; set; }
         public DbSet<Part> Parts { get; set; }
+        public DbSet<ServiceTaskPart> ServiceTaskParts { get; set; }
         public DbSet<UsedPart> UsedParts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<WorkOrder> WorkOrders { get; set; }

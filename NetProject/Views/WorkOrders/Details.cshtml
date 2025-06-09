@@ -1,6 +1,9 @@
 ﻿@model NetProject.Models.WorkOrder
 @{
     ViewData["Title"] = "Szczegóły zlecenia";
+    var totalLabor = Model.ServiceTasks.Sum(t => t.LaborCost);
+    var totalParts = Model.ServiceTasks.SelectMany(t => t.ServiceTaskParts).Sum(p => p.Part.UnitPrice * p.Quantity);
+    var total = totalLabor + totalParts;
 }
 
 <h1>@ViewData["Title"] — Zlecenie #@Model.Id</h1>
@@ -14,17 +17,39 @@
 <hr />
 <h4>Czynności serwisowe</h4>
 <table class="table">
-    <thead><tr><th>Nazwa</th><th>Koszt robocizny</th></tr></thead>
+    <thead><tr><th>Nazwa</th><th>Koszt robocizny</th><th>Części</th><th>Koszt części</th><th>Akcje</th></tr></thead>
     <tbody>
     @foreach (var t in Model.ServiceTasks)
     {
+        var czesci = t.ServiceTaskParts;
+        var sumaCzesci = czesci?.Sum(p => p.Part.UnitPrice * p.Quantity) ?? 0;
         <tr>
             <td>@t.Name</td>
             <td>@t.LaborCost zł</td>
+            <td>
+                @if (czesci != null && czesci.Any())
+                {
+                    <ul>
+                    @foreach (var p in czesci)
+                    {
+                        <li>@p.Part.Name x @p.Quantity = @(p.Part.UnitPrice * p.Quantity) zł</li>
+                    }
+                    </ul>
+                }
+            </td>
+            <td>@sumaCzesci zł</td>
+            <td>
+                <a asp-controller="ServiceTasks" asp-action="AddPart" asp-route-serviceTaskId="@t.Id" class="btn btn-sm btn-secondary">Dodaj część</a>
+                <a asp-controller="ServiceTasks" asp-action="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-warning">Edytuj</a>
+                <a asp-controller="ServiceTasks" asp-action="Delete" asp-route-id="@t.Id" class="btn btn-sm btn-danger">Usuń</a>
+            </td>
+
         </tr>
     }
     </tbody>
 </table>
+
+<p><strong>Suma całkowita (robocizna + części):</strong> @total zł</p>
 
 @if (User.IsInRole("Mechanik") || User.IsInRole("Admin"))
 {

@@ -17,5 +17,7 @@ namespace NetProject.Models
 
         [Range(0, int.MaxValue)]
         public int Quantity { get; set; } 
+
+        public ICollection<ServiceTaskPart> ServiceTaskParts { get; set; }
     }
 }

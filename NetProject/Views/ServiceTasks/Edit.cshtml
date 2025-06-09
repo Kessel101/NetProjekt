@@ -1,0 +1,40 @@
+@using NetProject.ViewModels
+
+@model NetProject.ViewModels.EditPartInTaskViewModel
+@{
+    ViewData["Title"] = "Edytuj czynność serwisową";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="WorkOrderId" />
+
+            <div class="form-group mb-3">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="LaborCost" class="control-label"></label>
+                <input asp-for="LaborCost" class="form-control" />
+                <span asp-validation-for="LaborCost" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Zapisz</button>
+                <a asp-controller="WorkOrders" asp-action="Details" asp-route-id="@Model.WorkOrderId" class="btn btn-secondary">Anuluj</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

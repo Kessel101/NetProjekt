@@ -40,7 +40,9 @@ namespace NetProject.Controllers
                 .Include(o => o.Customer)
                 .Include(o => o.Vehicle)
                 .Include(o => o.AssignedMechanic)
-                .Include(o => o.ServiceTasks)
+                .Include(w => w.ServiceTasks)
+                    .ThenInclude(t => t.ServiceTaskParts)
+                        .ThenInclude(sp => sp.Part)
                 .FirstOrDefaultAsync(o => o.Id == id);
             if (order == null) return NotFound();
             return View(order);

@@ -7,6 +7,8 @@ namespace NetProject.Models
     {
         public int Id { get; set; }
 
+        public ICollection<ServiceTaskPart> ServiceTaskParts { get; set; } = new List<ServiceTaskPart>();
+
         [Required]
         public string Name { get; set; } = string.Empty;
 
