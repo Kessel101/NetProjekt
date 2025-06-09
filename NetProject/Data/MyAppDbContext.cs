@@ -46,7 +46,7 @@ namespace NetProject.Data
                 .HasOne(w => w.AssignedMechanic)
                 .WithMany()
                 .HasForeignKey(w => w.AssignedMechanicId)
-                .OnDelete(DeleteBehavior.Restrict); // ✅ to dodaj
+                .OnDelete(DeleteBehavior.Restrict); 
             builder.Entity<ServiceTask>()
                 .HasOne(st => st.WorkOrder)
                 .WithMany(wo => wo.ServiceTasks)
