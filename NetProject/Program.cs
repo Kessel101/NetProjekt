@@ -6,10 +6,14 @@ using QuestPDF.Infrastructure;
 using NetProject.Data;
 using NetProject.Models;
 using NLog.Web;
+using NetProject.Services.PdfDocuments; // Zakładam, że w tej przestrzeni znajdują się EmailReportOptions i OpenOrderReportBackgroundService
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ─── NLog ───────────────────────────────────────────────────────────────────────
+// ─── Konfiguracja licencji QuestPDF ───────────────────────────────────────────
+QuestPDF.Settings.License = LicenseType.Community;
+
+// ─── NLog ─────────────────────────────────────────────────────────────────────
 builder.Logging.ClearProviders();
 builder.Host.UseNLog();
 
@@ -27,28 +31,33 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<MyAppDbContext>();
 
-// ─── MVC + Razor Pages ───────────────────────────────────────────────────────────
-builder.Services.AddControllersWithViews();  // kontrolery MVC + widoki
-builder.Services.AddRazorPages();            // Identity UI (Areas/Identity)
+// ─── MVC + Razor Pages ─────────────────────────────────────────────────────────
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
-// ─── Swagger (do testów API) ────────────────────────────────────────────────────
+// ─── Swagger ───────────────────────────────────────────────────────────────────
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "NetProject API", Version = "v1" });
 });
 
+// ─── Konfiguracja opcji EmailReport i rejestracja usługi działającej w tle ──
+// Te wywołania muszą być przed builder.Build()
+builder.Services.Configure<EmailReportOptions>(builder.Configuration.GetSection("EmailReport"));
+builder.Services.AddHostedService<OpenOrderReportBackgroundService>();
+
 var app = builder.Build();
 
-// ─── Seed ról i admina ──────────────────────────────────────────────────────────
+// ─── Seed ról i admina ───────────────────────────────────────────────────────
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     await DbInitializer.SeedRolesAndAdminAsync(services);
 }
 
-// ─── Middleware ─────────────────────────────────────────────────────────────────
-app.UseStaticFiles();        // aby działał ~/lib/bootstrap/css
+// ─── Middleware ───────────────────────────────────────────────────────────────
+app.UseStaticFiles();
 app.UseRouting();
 
 app.UseSwagger();
@@ -62,11 +71,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // ─── Mapowanie tras ─────────────────────────────────────────────────────────────
-// MVC
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-// Razor Pages (Identity UI)
 app.MapRazorPages();
 
 // Root → przekierowanie do panelu lub logowania
@@ -74,7 +81,5 @@ app.MapGet("/", (HttpContext ctx) =>
     Results.Redirect(ctx.User.Identity?.IsAuthenticated == true
         ? "/Identity/Account/Manage"
         : "/Identity/Account/Login"));
-
-QuestPDF.Settings.License = LicenseType.Community;
 
 app.Run();
