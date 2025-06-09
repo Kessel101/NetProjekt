@@ -34,7 +34,7 @@
             <td>@o.Status</td>
             <td>
                 <a asp-action="Details" asp-route-id="@o.Id">Szczegóły</a>
-                @if (User.IsInRole("Recepcjonista") || User.IsInRole("Admin") || User.IsInRole("Mechanik"))
+                @if (User.IsInRole("Admin") || User.IsInRole("Mechanik"))
                 {
                     @: |
                     <a asp-action="Edit" asp-route-id="@o.Id">Edytuj</a>

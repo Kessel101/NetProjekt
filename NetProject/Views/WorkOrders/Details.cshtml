@@ -61,7 +61,7 @@
 
 <hr />
 
-@if (User.IsInRole("Recepcjonista") || User.IsInRole("Admin"))
+@if (User.IsInRole("Mechanik") || User.IsInRole("Admin"))
 {
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edytuj zlecenie</a>
 }

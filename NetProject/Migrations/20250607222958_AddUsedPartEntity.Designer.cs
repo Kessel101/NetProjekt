@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetProject.Data;
 
@@ -11,9 +12,11 @@ using NetProject.Data;
 namespace NetProject.Migrations
 {
     [DbContext(typeof(MyAppDbContext))]
-    partial class MyAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250607222958_AddUsedPartEntity")]
+    partial class AddUsedPartEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,13 +298,6 @@ namespace NetProject.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
 
@@ -368,32 +364,6 @@ namespace NetProject.Migrations
                     b.HasIndex("WorkOrderId");
 
                     b.ToTable("ServiceTasks");
-                });
-
-            modelBuilder.Entity("NetProject.Models.ServiceTaskPart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("PartId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ServiceTaskId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PartId");
-
-                    b.HasIndex("ServiceTaskId");
-
-                    b.ToTable("ServiceTaskParts");
                 });
 
             modelBuilder.Entity("NetProject.Models.UsedPart", b =>
@@ -602,25 +572,6 @@ namespace NetProject.Migrations
                     b.Navigation("WorkOrder");
                 });
 
-            modelBuilder.Entity("NetProject.Models.ServiceTaskPart", b =>
-                {
-                    b.HasOne("NetProject.Models.Part", "Part")
-                        .WithMany("ServiceTaskParts")
-                        .HasForeignKey("PartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("NetProject.Models.ServiceTask", "ServiceTask")
-                        .WithMany("ServiceTaskParts")
-                        .HasForeignKey("ServiceTaskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Part");
-
-                    b.Navigation("ServiceTask");
-                });
-
             modelBuilder.Entity("NetProject.Models.UsedPart", b =>
                 {
                     b.HasOne("NetProject.Models.Part", "Part")
@@ -683,11 +634,6 @@ namespace NetProject.Migrations
                     b.Navigation("Vehicles");
                 });
 
-            modelBuilder.Entity("NetProject.Models.Part", b =>
-                {
-                    b.Navigation("ServiceTaskParts");
-                });
-
             modelBuilder.Entity("NetProject.Models.ServiceOrder", b =>
                 {
                     b.Navigation("Comments");
@@ -697,8 +643,6 @@ namespace NetProject.Migrations
 
             modelBuilder.Entity("NetProject.Models.ServiceTask", b =>
                 {
-                    b.Navigation("ServiceTaskParts");
-
                     b.Navigation("UsedParts");
                 });
 

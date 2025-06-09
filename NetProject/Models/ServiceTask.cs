@@ -19,5 +19,7 @@ namespace NetProject.Models
         [ForeignKey("WorkOrder")]
         public int WorkOrderId { get; set; }
         public WorkOrder WorkOrder { get; set; }
+        
+        public List<UsedPart> UsedParts { get; set; } = new();
     }
 }

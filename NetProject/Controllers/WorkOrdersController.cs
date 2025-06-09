@@ -92,7 +92,7 @@ namespace NetProject.Controllers
 
         // GET: /WorkOrders/Edit/5
         // dostępne dla Recepcjonista, Admin, Mechanik
-        [Authorize(Roles = "Recepcjonista,Admin,Mechanik")]
+        [Authorize(Roles = "Admin,Mechanik")]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -123,7 +123,7 @@ namespace NetProject.Controllers
         }
 
         // POST: /WorkOrders/Edit/5
-        [Authorize(Roles = "Recepcjonista,Admin,Mechanik")]
+        [Authorize(Roles = "Admin,Mechanik")]
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(WorkOrderViewModel vm)
         {

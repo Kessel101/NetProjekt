@@ -50,6 +50,17 @@ namespace NetProject.Data
                 .WithMany(wo => wo.ServiceTasks)
                 .HasForeignKey(st => st.WorkOrderId)
                 .OnDelete(DeleteBehavior.Restrict);
+            builder.Entity<UsedPart>()
+                .HasOne(up => up.Part)
+                .WithMany()
+                .HasForeignKey(up => up.PartId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<UsedPart>()
+                .HasOne(up => up.ServiceTask)
+                .WithMany(t => t.UsedParts)
+                .HasForeignKey(up => up.ServiceTaskId);
+            
         }
     }
 }

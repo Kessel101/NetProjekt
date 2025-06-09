@@ -1,0 +1,53 @@
+﻿@model NetProject.ViewModels.WorkOrderDetailsViewModel
+
+<h4>Czynności serwisowe</h4>
+
+@foreach (var task in Model.ServiceTasks)
+{
+    <div class="card mb-3 p-2">
+        <h5>@task.Name (Koszt robocizny: @task.LaborCost zł)</h5>
+
+        <h6>Części:</h6>
+        <table class="table table-sm">
+            <thead>
+            <tr><th>Nazwa</th><th>Ilość</th><th>Cena jedn.</th><th>Koszt</th></tr>
+            </thead>
+            <tbody>
+            @foreach (var up in task.UsedParts)
+            {
+                <tr>
+                    <td>@up.Part.Name</td>
+                    <td>@up.Quantity</td>
+                    <td>@up.Part.UnitPrice zł</td>
+                    <td>@(up.Quantity * up.Part.UnitPrice) zł</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+
+        @if (User.IsInRole("Mechanik") || User.IsInRole("Admin"))
+        {
+            <a asp-controller="UsedParts"
+               asp-action="Create"
+               asp-route-serviceTaskId="@task.Id"
+               class="btn btn-sm btn-outline-primary mb-2">
+                Dodaj część
+            </a>
+        }
+    </div>
+}
+
+@* podsumowanie całości zlecenia *@
+@{
+    var totalLabor = Model.ServiceTasks.Sum(t => t.LaborCost);
+    var totalParts = Model.ServiceTasks
+        .SelectMany(t => t.UsedParts)
+        .Sum(up => up.Quantity * up.Part.UnitPrice);
+    var grandTotal = totalLabor + totalParts;
+}
+
+<hr />
+
+<p><strong>Koszt robocizny:</strong> @totalLabor zł</p>
+<p><strong>Koszt części:</strong> @totalParts zł</p>
+<p><strong>Łącznie:</strong> @grandTotal zł</p>
