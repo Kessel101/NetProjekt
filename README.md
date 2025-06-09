@@ -1,129 +1,217 @@
-# **NetProject \- System zarządzania warsztatem samochodowym**
 
-## **Spis treści**
+# 🚗 **NetProject – System zarządzania warsztatem samochodowym**
+
+## 📚 Spis treści
 
 1. [Opis projektu](#opis-projektu)  
 2. [Główne funkcjonalności](#główne-funkcjonalności)  
-3. [Technologie i biblioteki](#technologie-i-biblioteki)  
-4. [Uruchomienie projektu](#uruchomienie-projektu)  
-   * [Wymagania wstępne](#wymagania-wstępne)  
-   * [Instalacja](#instalacja)  
-   * [Konfiguracja](#konfiguracja)  
-5. [Logowanie i role użytkowników](#logowanie-i-role-użytkowników)  
-   * [Dostępne role](#dostępne-role)  
-   * [Domyślni użytkownicy](#domyślni-użytkownicy)  
-6. [Baza danych](#baza-danych)  
-7. [Proces CI/CD](#proces-cicd)  
-8. [Struktura projektu](#struktura-projektu)
+3. [Technologie i biblioteki](technologie-i-biblioteki)  
+4. [Uruchomienie projektu](uruchomienie-projektu)  
+   * [Wymagania wstępne](wymagania-wstępne)  
+   * [Instalacja](instalacja)  
+   * [Konfiguracja](konfiguracja)  
+5. [Logowanie i role użytkowników](logowanie-i-role-użytkowników)  
+   * [Dostępne role](dostępne-role)  
+   * [Domyślni użytkownicy](domyślni-użytkownicy)  
+6. [Baza danych](baza-danych)  
+7. [Testy](testy)  
+   * [Testy jednostkowe](testy-jednostkowe)  
+   * [Testy wydajnościowe NBomber](testy-wydajnościowe-nbomber)  
+8. [Proces CI/CD](proces-cicd)  
+9. [Struktura projektu](struktura-projektu)
 
-## **Opis projektu**
+---
 
-**NetProject** to aplikacja webowa oparta na technologii ASP.NET Core, stworzona do zarządzania zleceniami serwisowymi w warsztacie samochodowym. System umożliwia ewidencję klientów, ich pojazdów oraz historii napraw. Aplikacja wspiera różne poziomy dostępu dzięki systemowi ról.
+## 🧾 Opis projektu
 
-## **Główne funkcjonalności**
+**NetProject** to aplikacja webowa ASP.NET Core przeznaczona do kompleksowego zarządzania zleceniami serwisowymi w warsztacie samochodowym. Umożliwia ewidencjonowanie klientów, przypisywanie pojazdów, prowadzenie historii napraw oraz zarządzanie zleceniami. System wykorzystuje role użytkowników oraz logowanie zdarzeń w celu zapewnienia kontroli dostępu i przejrzystości działania.
 
-* **Zarządzanie klientami**: Dodawanie, edycja i przeglądanie danych klientów.  
-* **Ewidencja pojazdów**: Przypisywanie pojazdów do klientów.  
-* **Obsługa** zleceń **serwisowych**: Tworzenie nowych zleceń, przypisywanie zadań, dodawanie części i komentarzy.  
-* **System uwierzytelniania**: Logowanie i rejestracja użytkowników.  
-* **Panel administracyjny**: Zarządzanie użytkownikami i ich rolami.  
-* **Logowanie zdarzeń**: Zapisywanie logów aplikacji przy użyciu NLog.
+---
 
-## **Technologie i biblioteki**
+## ✨ Główne funkcjonalności
 
-* **Backend**: ASP.NET Core 9.0  
-* **Baza danych**: Entity Framework Core, SQL Server  
-* **Uwierzytelnianie**: ASP.NET Core Identity  
-* **Frontend**: Razor Pages, Bootstrap  
-* **Logowanie**: NLog  
-* **Mapowanie obiektów**: AutoMapper / Mapperly  
-* **API**: Swagger (Swashbuckle)
+- ✅ **Zarządzanie klientami** (dodawanie, edycja, lista)  
+- ✅ **Ewidencja pojazdów** przypisanych do klientów  
+- ✅ **Obsługa zleceń serwisowych** (dodawanie części, przypisywanie zadań)  
+- ✅ **System logowania i rejestracji** (ASP.NET Identity)  
+- ✅ **Panel administracyjny** do zarządzania kontami  
+- ✅ **Logowanie zdarzeń aplikacji** przez NLog  
+- ✅ **Swagger UI** – dokumentacja REST API
 
-## **Uruchomienie projektu**
+---
 
-### **Wymagania wstępne**
+## 🧰 Technologie i biblioteki
 
-* [ASP.NET Core: .NET 9.0](https://learn.microsoft.com/en-us/aspnet/core/release-notes/aspnetcore-9.0?view=aspnetcore-9.0)  
-* [SQL Server](https://www.microsoft.com/sql-server/sql-server-downloads) (wersja Developer)  
-* Dowolne IDE (Visual Studio, JetBrains Rider, VS Code)
+- **.NET**: ASP.NET Core 9.0  
+- **Baza danych**: Entity Framework Core + SQL Server  
+- **Frontend**: Razor Pages + Bootstrap  
+- **Uwierzytelnianie**: ASP.NET Core Identity  
+- **Mapowanie danych**: AutoMapper / Mapperly  
+- **Logi**: NLog  
+- **Testy jednostkowe**: xUnit, Moq  
+- **Testy wydajnościowe**: NBomber  
+- **API Docs**: Swagger (Swashbuckle.AspNetCore)
 
-### **Instalacja**
+---
 
-1. Sklonuj repozytorium:  
-   git clone https://github.com/Kessel101/NetProjekt
+## 🚀 Uruchomienie projektu
 
-2. Otwórz projekt w wybranym IDE i/lub wykonaj komendę:
-   `cd NetProject` w swojej powłoce (np. Powershell).
+### ✅ Wymagania wstępne
 
-### **Konfiguracja**
+- [.NET SDK 9.0](https://dotnet.microsoft.com/en-us/download/dotnet/9.0)
+- [SQL Server 2019 lub nowszy](https://www.microsoft.com/sql-server/sql-server-downloads)  
+- Visual Studio 2022 / JetBrains Rider / VS Code
 
-1. **Baza danych**:  
-   * W pliku appsettings.json zaktualizuj ConnectionStrings, aby wskazywały na Twoją instancję SQL Server, np. w przypadku domyślnego localhosta:  
-    ` "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=TestDb;Trusted_Connection=True;TrustServerCertificate=True;"`
-  }
+### 🛠 Instalacja
 
-2. **Migracje bazy danych**:  
-   * Upewnij się, że masz zainstalowane narzędzia EF Core CLI. Jeśli nie, wykonaj polecenie:  
-     `dotnet tool install \--global dotnet-ef`
+```bash
+git clone https://github.com/Kessel101/NetProjekt.git
+cd NetProjekt
+```
 
-   * Zastosuj migracje, aby utworzyć schemat bazy danych. W głównym folderze projektu (NetProject) wykonaj:  
-     `dotnet ef database update`
+### ⚙️ Konfiguracja
 
-3. **Uruchomienie**:  
-   * Zbuduj, a następnie uruchom aplikację z poziomu IDE lub za pomocą poleceń: 
-     1. `dotnet build` 
-     2. `dotnet run`
+1. **Połączenie z bazą danych**  
+W pliku `appsettings.json` zaktualizuj sekcję `ConnectionStrings`:
 
-Aplikacja będzie dostępna pod adresem http://localhost:5000.
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=NetProjectDb;Trusted_Connection=True;TrustServerCertificate=True;"
+}
+```
 
-## **Logowanie i role użytkowników**
+2. **Zastosuj migracje EF Core**  
+Upewnij się, że masz zainstalowane CLI EF Core:
 
-System wykorzystuje ***ASP.NET Core Identity*** do zarządzania uwierzytelnianiem i autoryzacją.
+```bash
+dotnet tool install --global dotnet-ef
+```
 
-### **Dostępne role**
+Następnie wykonaj:
 
-* **Admin**: Pełny dostęp do systemu, w tym do panelu administracyjnego, gdzie może zarządzać kontami innych użytkowników.  
-* **User**: Standardowy użytkownik (np. pracownik serwisu), który może zarządzać klientami, pojazdami i zleceniami, ale nie ma dostępu do panelu administracyjnego.
+```bash
+dotnet ef database update --project NetProject
+```
 
-### **Domyślni użytkownicy**
+3. **Uruchom aplikację**
 
-Po pierwszym uruchomieniu i zastosowaniu migracji, w systemie tworzeni są domyślni użytkownicy (dzięki DataInitializer.cs):
+```bash
+dotnet build
+dotnet run --project NetProject
+```
 
-* **Administrator**:  
-  * **Login**: admin@example.com  
-  * **Hasło**: Admin123\!  
-* **Użytkownik standardowy**:  
-  * **Login**: user@example.com  
-  * **Hasło**: User123\!
+Aplikacja będzie dostępna pod adresem:  
+👉 http://localhost:5000
 
-## **Baza danych**
+---
 
-Projekt korzysta z ***Entity Framework Core*** jako ORM. Podejście "Code-First" oznacza, że schemat bazy danych jest generowany na podstawie modeli zdefiniowanych w kodzie (w folderze Models).
+## 🔐 Logowanie i role użytkowników
 
-Wszystkie migracje znajdują się w folderze Migrations. Aby dodać nową migrację, wykonaj polecenie w folderze projektu:
+Aplikacja używa ASP.NET Core Identity z podziałem na role:
 
-dotnet ef migrations add NazwaMigracji
+### 🎭 Dostępne role
 
-## **Proces CI/CD**
+- **Admin**: pełna kontrola, dostęp do panelu administracyjnego  
+- **User**: możliwość zarządzania zleceniami, klientami, pojazdami  
 
-Repozytorium zawiera skonfigurowany workflow GitHub Actions (`.github/workflows/dotnet-ci.yml`), który automatycznie wykonuje następujące zadania przy każdym pushu lub pull requeście do gałęzi `main`:
+### 👥 Domyślni użytkownicy (inicjalizacja danych)
 
-- **Restore dependencies**: Pobranie wszystkich niezbędnych pakietów.
-- **Build**: Kompilacja projektu przy użyciu `dotnet build`.
-- **Test**: Uruchomienie testów jednostkowych przy użyciu `dotnet test`.
+Użytkownicy tworzeni są automatycznie w klasie `DataInitializer.cs` po migracji bazy:
 
-Dzięki temu procesowi mamy pewność, że każda zmiana wprowadzona do kodu jest natychmiast kompilowana i testowana, co ułatwia wczesne wykrywanie błędów oraz poprawia jakość kodu.
+| Rola   | Login               | Hasło      |
+|--------|---------------------|------------|
+| Admin  | admin@example.com   | Admin123!  |
+| User   | user@example.com    | User123!   |
 
-## **Struktura projektu**
+---
 
-Najważniejsze foldery w projekcie NetProject:
+## 🗃️ Baza danych
 
-* Controllers: Kontrolery MVC obsługujące żądania HTTP.  
-* Data: Kontekst bazy danych (MyAppDbContext), migracje oraz inicjalizator danych.  
-* DTOs: (Data Transfer Objects) Obiekty używane do transferu danych między warstwami (np. między kontrolerem a widokiem).  
-* Models: Klasy reprezentujące encje w bazie danych (np. Customer, Vehicle).  
-* Services: Logika biznesowa aplikacji.  
-* Views: Pliki .cshtml (Razor) definiujące interfejs użytkownika.  
-* ViewModels: Modele przeznaczone specjalnie dla widoków, łączące dane z różnych źródeł.  
-* wwwroot: Pliki statyczne, takie jak CSS, JavaScript i biblioteki front-endowe.
+Projekt korzysta z podejścia **Code-First** w Entity Framework Core.  
+Migracje znajdują się w folderze `Migrations`.
+
+📌 Aby dodać nową migrację:
+
+```bash
+dotnet ef migrations add NazwaMigracji --project NetProject
+```
+
+---
+
+## 🧪 Testy
+
+### ✅ Testy jednostkowe
+
+Zlokalizowane w projekcie `NetProject.Tests`:
+
+```bash
+dotnet test NetProject.Tests
+```
+
+Zawierają testy dla serwisów, kontrolerów i PDFów.
+
+### 🚀 Testy wydajnościowe NBomber
+
+Zlokalizowane w `NetProject.Tests/PerformanceTests/OrdersLoadTest.cs`.
+
+#### 👉 Jak uruchomić:
+
+1. Endpoint `/api/orders/active` musi być dostępny publicznie lub [AllowAnonymous].
+2. Upewnij się, że masz dodaną paczkę:
+
+```bash
+dotnet add package NBomber
+```
+
+3. Uruchom test:
+
+```bash
+dotnet run --project NetProject.Tests
+```
+
+#### 📄 Raport PDF
+Po zakończeniu testów wygenerowany zostanie plik:
+```
+nbomber-report.pdf
+```
+
+---
+
+## 🔁 Proces CI/CD
+
+Repozytorium zawiera workflow GitHub Actions:  
+`.github/workflows/dotnet-ci.yml`
+
+🔧 Wykonuje automatycznie:
+
+- `dotnet restore`
+- `dotnet build`
+- `dotnet test`
+
+Po każdym pushu lub pull requeście do gałęzi `main`.
+
+---
+
+## 📁 Struktura projektu
+
+```
+NetProject/
+│
+├── Controllers/         → kontrolery aplikacji
+├── Data/                → DbContext, migracje, inicjalizacja danych
+├── DTOs/                → obiekty DTO
+├── Models/              → encje EF Core (Customer, Vehicle, Order, itd.)
+├── Services/            → logika biznesowa (serwisy, interfejsy)
+├── Views/               → Razor Pages (.cshtml)
+├── ViewModels/          → klasy do komunikacji widok–model
+├── wwwroot/             → pliki statyczne (Bootstrap, CSS, JS)
+├── NetProject.Tests/    → testy jednostkowe + wydajnościowe
+└── NetProject.sln       → plik rozwiązania .NET
+```
+
+---
+
+## 📬 Kontakt
+
+Autor repozytorium: [@Kessel101](https://github.com/Kessel101)  
+Projekt na potrzeby przedmiotu – Politechnika Krakowska, semestr 4.
