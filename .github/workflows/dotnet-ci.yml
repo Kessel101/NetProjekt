@@ -22,8 +22,10 @@ jobs:
     - name: Restore dependencies # krok, który przywraca zależności projektu.
       run: dotnet restore # uruchamia polecenie dotnet restore do przywracania zależności.
 
-    - name: Build project # krok, który buduje projekt.
+    - name: Build project
       run: dotnet build --no-restore --configuration Release
+    
+    - name: Run tests
+      run: dotnet test --no-build --configuration Release --verbosity normal
+    
 
-    - name: Run tests # krok, który uruchamia testy.
-      run: dotnet test --no-build --verbosity normal
