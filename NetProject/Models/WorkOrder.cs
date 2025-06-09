@@ -17,9 +17,9 @@ namespace NetProject.Models
 
         public string Status { get; set; } = "Nowe";
         public DateTime CreatedAt { get; set; }
-
-        // tu musi być:
         public ICollection<ServiceTask> ServiceTasks { get; set; } = new List<ServiceTask>();
+        
+        public ICollection<WorkOrderComment> Comments { get; set; } = new List<WorkOrderComment>();
     }
 
 }

@@ -66,4 +66,43 @@
     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edytuj zlecenie</a>
 }
 
+<hr />
+<h4>Komentarze</h4>
+@if (!Model.Comments.Any())
+{
+    <p>Brak komentarzy.</p>
+}
+else
+{
+    <ul class="list-group mb-3">
+        @foreach (var c in Model.Comments.OrderBy(c => c.CreatedAt))
+        {
+            <li class="list-group-item">
+                <strong>@c.Author.UserName</strong>
+                <span class="text-muted">(@c.CreatedAt:yyyy-MM-dd HH:mm)</span>
+                <p>@c.Content</p>
+            </li>
+        }
+    </ul>
+}
+
+@if (User.Identity?.IsAuthenticated ?? false)
+{
+    <form asp-controller="WorkOrderComments"
+          asp-action="Create"
+          method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" value="@Model.Id" name="WorkOrderId" />
+        <div class="mb-3">
+            <label for="Content" class="form-label">Twój komentarz:</label>
+            <textarea name="Content" class="form-control" rows="3" required maxlength="1000"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Dodaj komentarz</button>
+    </form>
+}
+else
+{
+    <p class="text-muted">Musisz się <a asp-area="Identity" asp-page="/Account/Login">zalogować</a>, aby komentować.</p>
+}
+
 <a asp-action="Index" class="btn btn-secondary">Powrót do listy</a>

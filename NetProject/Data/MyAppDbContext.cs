@@ -21,6 +21,8 @@ namespace NetProject.Data
         public DbSet<UsedPart> UsedParts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<WorkOrder> WorkOrders { get; set; }
+        
+        public DbSet<WorkOrderComment> WorkOrderComments { get; set; }
 
 
         // Opcjonalnie konfiguracje np. relacji kluczowych
@@ -60,6 +62,13 @@ namespace NetProject.Data
                 .HasOne(up => up.ServiceTask)
                 .WithMany(t => t.UsedParts)
                 .HasForeignKey(up => up.ServiceTaskId);
+            
+            builder.Entity<WorkOrderComment>()
+                .HasOne(c => c.WorkOrder)
+                .WithMany(o => o.Comments)
+                .HasForeignKey(c => c.WorkOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+            
             
         }
     }

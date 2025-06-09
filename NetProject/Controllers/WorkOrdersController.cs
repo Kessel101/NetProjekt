@@ -43,6 +43,8 @@ namespace NetProject.Controllers
                 .Include(w => w.ServiceTasks)
                     .ThenInclude(t => t.ServiceTaskParts)
                         .ThenInclude(sp => sp.Part)
+                .Include(o => o.Comments)
+                    .ThenInclude(c => c.Author)
                 .FirstOrDefaultAsync(o => o.Id == id);
             if (order == null) return NotFound();
             return View(order);
